@@ -11,10 +11,10 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Set up Java
+      - name: Set up Java 1.8
         uses: actions/setup-java@v2
         with:
-          java-version: '8'
+          java-version: '1.8'
           distribution: 'adopt'
 
       - name: Set up Python
@@ -29,7 +29,35 @@ jobs:
           pip install pytest
           pip install httpx
 
+      - name: Start test om2m
+        run: |
+          echo "Starting test om2m"
+          cd tests/test-om2m
+          java -version
+          java -jar -ea -Declipse.ignoreApp=true -Dosgi.clean=true -Ddebug=true plugins/org.eclipse.equinox.launcher_1.3.0.v20140415-2008.jar -console -noExit &
+          echo "Test om2m started with pid: $!"
+
       - name: Run tests
         run: |
-          chmod +x ./run.sh
-          ./run.sh --test
+          echo "Running tests"
+          cd tests
+          pytest --disable-warnings
+          test_exit_code=$?
+
+      - name: Clean up
+        if: always()
+        run: |
+          echo "Killing test om2m"
+          pkill -f org.eclipse.equinox.launcher
+          echo "Test om2m killed"
+          echo "Deleting test om2m db"
+          rm -rf tests/test-om2m/database/
+          rm -r tests/test.db
+          echo "Waiting for all extra files to be deleted"
+          sleep 5
+
+      - name: Check test results
+        if: steps.run-tests.outputs.test_exit_code != 0
+        run: |
+          echo "Tests failed"
+          exit 1
