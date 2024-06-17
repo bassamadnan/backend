@@ -8,6 +8,18 @@ jobs:
   run-tests:
     runs-on: ubuntu-latest
 
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      ACCESS_TOKEN_EXPIRE_MINUTES: ${{ secrets.ACCESS_TOKEN_EXPIRE_MINUTES }}
+      REFRESH_TOKEN_EXPIRE_MINUTES: ${{ secrets.REFRESH_TOKEN_EXPIRE_MINUTES }}
+      ALGORITHM: ${{ secrets.ALGORITHM }}
+      JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
+      JWT_REFRESH_SECRET_KEY: ${{ secrets.JWT_REFRESH_SECRET_KEY }}
+      OM2M_URL: ${{ secrets.OM2M_URL }}
+      OM2M_USERNAME: ${{ secrets.OM2M_USERNAME }}
+      OM2M_PASSWORD: ${{ secrets.OM2M_PASSWORD }}
+      WORKERS: ${{ secrets.WORKERS }}
+
     steps:
       - uses: actions/checkout@v2
 
