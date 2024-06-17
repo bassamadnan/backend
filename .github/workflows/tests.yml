@@ -40,6 +40,7 @@ jobs:
           pip install -r requirements.txt
           pip install httpx
           pip install pytest
+          pip install python-multipart
 
       - name: Start test om2m
         run: |
