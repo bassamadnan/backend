@@ -582,3 +582,11 @@ CseService discovered
 CSE Service discovered
 [2024-06-18 03:18:09,791 INFO] - org.eclipse.om2m.core.Activator 
 CSE Started
+[2024-06-20 02:49:33,350 INFO] - org.eclipse.om2m.datamapping.jaxb.Activator 
+Starting Data Mapper
+[2024-06-20 02:49:33,351 INFO] - org.eclipse.om2m.datamapping.jaxb.Activator 
+Registering XML Mapper Service..
+[2024-06-20 02:49:42,353 INFO] - org.eclipse.om2m.datamapping.jaxb.Activator 
+XML Mapper service registered.
+[2024-06-20 02:49:42,354 INFO] - org.eclipse.om2m.datamapping.jaxb.Activator 
+Registering JSON Mapper Service..
