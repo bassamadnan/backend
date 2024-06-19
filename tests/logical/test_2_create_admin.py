@@ -1,9 +1,9 @@
 from tests import client
 from app.models.user_types import UserType
-
+import time
 
 def test_create_admin():
-
+    time.sleep(1)
     response = client.post(
         "/user/login", json={"email": "admin@localhost", "password": "admin"}
     )
