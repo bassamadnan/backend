@@ -53,7 +53,7 @@ class Om2m:
             "X-M2M-Origin": self.XM2MORIGIN + parent,
             "Content-Type": "application/json;ty=4",
         }
-
+        print(data)
         r = requests.post(
             self.url + "/" + parent + "/" + node + "/Data?rcn=1",
             headers=headers,
@@ -163,4 +163,3 @@ class Om2m:
             timeout=timeout,
         )
         return r
-
