@@ -16,3 +16,6 @@ OM2M_USERNAME = os.getenv("OM2M_USERNAME")
 OM2M_PASSWORD = os.getenv("OM2M_PASSWORD")
 ROOT_PATH = os.getenv("ROOT_PATH") or '/'
 MOBIUS_XM2MRI = os.getenv("MOBIUS_XM2MRI")
+BROKER_ADDR = str(os.getenv("BROKER_ADDR", "127.0.0.1"))
+BORKER_PORT = int(os.getenv("BORKER_PORT", 1883))
+DEFAULT_TOPIC = str(os.getenv("DEFAULT_TOPIC", "oneM2M/req/#"))
