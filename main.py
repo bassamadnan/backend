@@ -20,6 +20,7 @@ from app.routes.sensor_types import router as sensor_types_router
 from app.routes.stats import router as stats_router
 from app.routes.cin_mobius import router as onem2m_cin_router
 from app.config.settings import OM2M_URL, ROOT_PATH
+from mqtt_handler import app as mqtt_app
 
 def initialize():
     """
@@ -84,6 +85,8 @@ def initialize():
 initialize()
 
 app = FastAPI(root_path=ROOT_PATH)
+
+app.mount("/mqtt", mqtt_app)
 
 # Add CORS middleware
 app.add_middleware(

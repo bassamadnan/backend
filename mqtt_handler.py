@@ -1,9 +1,7 @@
-# from sqlalchemy.orm import Session
-
+from fastapi import FastAPI
 from app.database import get_session
 from app.utils.om2m_lib import Om2m
 from app.utils.utils import get_vertical_name, create_hash
-
 from app.models.node import Node as DBNode
 from app.models.node_owners import NodeOwners as DBNodeOwners
 from app.models.user import User as DBUser
@@ -13,10 +11,13 @@ from app.config.settings import OM2M_URL, MOBIUS_XM2MRI, JWT_SECRET_KEY, BROKER_
 import paho.mqtt.client as mqtt
 import json
 import re
+from threading import Thread
 
 # Initialize Om2m instance
 om2m = Om2m(MOBIUS_XM2MRI, OM2M_URL)
 
+# Create a FastAPI app instance
+app = FastAPI()
 # Initialize the database session once at the start
 session_generator = get_session()
 session = next(session_generator)
@@ -37,16 +38,12 @@ def get_vendor(msg_topic):
     else:
         return None
 
-def create_cin(
-    cin,
-    authentication: str,
-    token_id: str,
-    session
-):
-    node = session.query(DBNode).filter(DBNode.token_num == token_id).first()
-    if node is None:
-        print("Node not found")
-        return
+def create_cin(cin, authentication: str, token_id: str):
+    with next(get_session()) as session:
+        node = session.query(DBNode).filter(DBNode.token_num == token_id).first()
+        if node is None:
+            print("Node not found")
+            return
 
     # Check if vendor is assigned to the node
     vendor = (
@@ -136,20 +133,30 @@ def on_message(client, userdata, msg):
     """Callback function triggered when a message is received on the subscribed topic."""
     try:
         data = json.loads(msg.payload.decode('utf-8'))
-
-        print(f"PATH : {get_vendor(msg.topic) } \nHEADER : {data['Authentication']} \n TOKEN_ID : {data['token_id']}\nDATA : {data['data']}")
-        create_cin(data['data'], data['Authentication'], data['token_id'], session)
+        print(f"PATH : {get_vendor(msg.topic)} \nHEADER : {data['Authentication']} \n TOKEN_ID : {data['token_id']}\nDATA : {data['data']}")
+        create_cin(data['data'], data['Authentication'], data['token_id'])
     except json.JSONDecodeError:
         print(f"Error: Payload could not be decoded as JSON: {msg.payload}")
 
-def mqtt_listener():
+# def mqtt_listener():
+#     client = mqtt.Client()
+#     client.on_connect = on_connect
+#     client.on_message = on_message
+#     client.connect(BROKER_ADDR, BORKER_PORT)
+#     # Start the client loop indefinitely (stay connected)
+#     client.loop_forever()
+
+def start_mqtt_client():
     client = mqtt.Client()
     client.on_connect = on_connect
     client.on_message = on_message
     client.connect(BROKER_ADDR, BORKER_PORT)
-    # Start the client loop indefinitely (stay connected)
     client.loop_forever()
 
-if __name__=="__main__":
-    mqtt_listener()
-    session.close()  # Close the session when the script ends
+@app.on_event("startup")
+async def startup_event():
+    Thread(target=start_mqtt_client, daemon=True).start()
+
+# if __name__=="__main__":
+#     mqtt_listener()
+#     session.close()  # Close the session when the script ends
